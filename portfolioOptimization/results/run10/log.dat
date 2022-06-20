@@ -1,0 +1,36 @@
+(nlp_bert_venv) bmartins@Brunos-MacBook-Pro portfolioOptSolved % ./run.sh
+
+Single period portfolio optimization run...
+
+Loading live data from the web from Yahoo! finance from 2019-01-01 to 2022-04-30...
+
+CQM run...
+
+Best feasible solution:
+AAPL      2
+MSFT      0
+AAL       0
+WMT       0
+MMM       0
+AIG       3
+GOOGL     0
+AMD       0
+BLK       0
+KO        1
+GE        0
+GM        0
+INTC      0
+JNJ       1
+JPM       0
+CMCSA     3
+MA        0
+MCD       0
+MRNA      1
+PFE       0
+
+Estimated Returns: 31.1
+Sales Revenue: 0.00
+Purchase Cost: 989.13
+Transaction Cost: 9.89
+Variance: 4899.22
+

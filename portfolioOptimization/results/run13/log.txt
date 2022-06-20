@@ -1,0 +1,24 @@
+
+Single period portfolio optimization run...
+
+Loading live data from the web from Yahoo! finance from 2019-01-01 to 2022-04-30...
+
+CQM run...
+min risk: 0.0
+spending: 988.3806343078613
+sales: 0.0
+
+Best feasible solution:
+AAPL	  5
+AAL	  0
+MMM	  1
+AIG	  1
+GM	  0
+INTC	  0
+
+Estimated Returns: 31.26
+Sales Revenue: 0.00
+Purchase Cost: 988.38
+Transaction Cost: 9.88
+Variance: 5510.28
+

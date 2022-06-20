@@ -1,0 +1,16 @@
+stocks: [ 'AAPL',  'MSFT',  'WMT',  'AAL',  'LDOS',  'INTU',  'HIG',  'SWKS', 'FAST',  'GOOG',  'NDAQ',  'RHI',  'ETR',  'AOS',  'VNO',  'CPT',  'HPE',  'EFX',  'AVGO', 'DLTR',  'MLM',  'PSA',  'TXN',  'ALB',  'NVDA',  'AVB',  'DRE',  'TTWO',  'LYB',  'NCLH', 'RCL',  'FISV',  'EQR',  'STX',  'TECH',  'RTX',  'D',  'EMR',  'LRCX',  'SLB',  'ALGN',  'IEX', 'WTW',  'EXR',  'FIS',  'COO',  'UDR',  'BBY',  'NWSA',  'EPAM']
+dates: ['2018-10-01', '2020-01-01']
+budget: 1000
+bin_size:
+gamma:
+alpha: 0.005
+file_path:
+baseline: '^GSPC'
+max_risk: 0.0
+min_return: 0.0
+model_type: CQM
+rebalance: True
+sampler_args:
+verbose: True
+num: 0
+t_cost: 0.01

@@ -1,0 +1,67 @@
+
+Single period portfolio optimization run...
+
+Loading live data from the web from Yahoo! finance from 2019-01-01 to 2022-04-30...
+shares_intervals: {'AAPL': [0, 1, 2, 3, 4, 5, 6], 'MSFT': [0, 1, 2, 3], 'AAL': [0, 5, 10, 16, 21, 27, 32, 37, 43, 48], 'WMT': [0, 1, 2, 3, 4, 5, 6]}
+
+CQM run...
+covariance matrix
+          AAPL      MSFT       AAL       WMT
+AAPL  0.007436  0.003864  0.003753  0.001526
+MSFT  0.003864  0.003748  0.002448  0.001150
+AAL   0.003753  0.002448  0.018568  0.000588
+WMT   0.001526  0.001150  0.000588  0.002306
+min risk: 0.0
+price: AAPL    157.418701
+MSFT    276.875122
+AAL      18.770000
+WMT     152.435913
+Name: 2022-04-29 00:00:00, dtype: float64
+avg_monthly_returns: AAPL    0.039129
+MSFT    0.028096
+AAL    -0.006494
+WMT     0.014636
+dtype: float64
+n_samples: 40
+feasible_samples:    ... e02fe0ef-6ec9-49a1-84cd-eb6c1a1b6a2a     energy num_oc. ... is_fea.
+5  ...                                  0.0 -10.594299       1 ...    True
+6  ...                                  0.0 -10.594299       1 ...    True
+4  ...                                  0.0 -10.594299       1 ...    True
+7  ...                                  0.0 -10.594299       1 ...    True
+10 ...                                  0.0 -10.594299       1 ...    True
+14 ...                                  0.0 -10.594299       1 ...    True
+15 ...                                  0.0 -10.594299       1 ...    True
+20 ...                                  0.0 -10.594299       1 ...    True
+21 ...                                  0.0 -10.594299       1 ...    True
+22 ...                                  0.0 -10.594299       1 ...    True
+23 ...                                  0.0 -10.594299       1 ...    True
+24 ...                                  0.0 -10.594299       1 ...    True
+1  ...                                  4.0  -2.327492       1 ...    True
+2  ...                                  4.0  -2.327492       1 ...    True
+8  ...                                  4.0  -2.327492       1 ...    True
+12 ...                                  4.0  -2.327492       1 ...    True
+13 ...                                  4.0  -2.327492       1 ...    True
+17 ...                                  4.0  -2.327492       1 ...    True
+3  ...                                 12.0   2.724686       1 ...    True
+0  ...                                 12.0   2.724686       1 ...    True
+9  ...                                 12.0   2.724686       1 ...    True
+11 ...                                 12.0   2.724686       1 ...    True
+16 ...                                 12.0   2.724686       1 ...    True
+18 ...                                 12.0   2.724686       1 ...    True
+19 ...                                 12.0   2.724686       1 ...    True
+['INTEGER', 25 rows, 25 samples, 12 variables]
+spending: 988.0440673828125
+sales: 0.0
+
+Best feasible solution:
+AAPL	  1
+MSFT	  3
+AAL	  0
+WMT	  0
+
+Estimated Returns: 29.5
+Sales Revenue: 0.00
+Purchase Cost: 988.04
+Transaction Cost: 9.88
+Variance: 3780.49
+

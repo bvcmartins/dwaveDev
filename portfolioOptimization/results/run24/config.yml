@@ -1,0 +1,16 @@
+stocks: ['ENPH', 'AMD', 'SEDG', 'ETN', 'PAYC', 'LRCX', 'TER', 'KLAC', 'GNRC', 'AMAT', 'TDG', 'CDAY', 'MKTX', 'CMG', 'DXCM', 'CPRT', 'KEYS', 'EPAM', 'MTCH', 'NXPI', 'WDC', 'CZR', 'MSCI', 'ANSS', 'MCHP', 'NVR', 'QRVO', 'QCOM', 'MCO', 'AAPL', 'XRAY', 'MLM', 'TGT', 'MAS', 'MPWR', 'CDW', 'ZBRA', 'STX', 'AZO', 'GPN', 'EW', 'TSN', 'PHM', 'WYNN', 'NOW', 'CDNS', 'TFX', 'IR', 'EQIX', 'SWKS']
+dates: ['2018-10-01', '2020-01-01']
+budget: 1000
+bin_size:
+gamma:
+alpha: 0.005
+file_path:
+baseline: '^GSPC'
+max_risk: 0.0
+min_return: 0.0
+model_type: CQM
+rebalance: True
+sampler_args:
+verbose: True
+num: 0
+t_cost: 0.01
