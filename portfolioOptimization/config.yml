@@ -1,0 +1,17 @@
+stocks: ['MRO', 'DVN', 'NUE', 'APA', 'OXY', 'AAPL', 'MOS', 'COP', 'EOG', 'CF', 'FANG', 'VLO', 'HAL', 'MPC', 'FTNT', 'PXD', 'XOM', 'HES', 'CVX', 'IT', 'SLB', 'ADM', 'MCK', 'AZO', 'EXR', 'BBWI', 'BKR', 'ANTM', 'PWR', 'OKE', 'IRM', 'WMB', 'PSA', 'FCX', 'NVDA', 'LYV', 'CTRA', 'DLTR', 'WRB', 'KR', 'GD', 'AIG', 'EXC', 'ANET', 'PLD', 'HPQ', 'SBNY', 'CPT', 'KIM', 'NOC']
+stocks:
+dates: ['2021-01-01', '2022-05-01']
+budget: 1000
+bin_size:
+gamma:
+alpha: 0.005
+file_path:
+baseline: '^GSPC'
+max_risk: 0.0
+min_return: 0.0
+model_type: CQM
+rebalance: True
+sampler_args:
+verbose: True
+num: 0
+t_cost: 0.01

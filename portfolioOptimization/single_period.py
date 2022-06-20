@@ -64,6 +64,8 @@ class SinglePeriod:
         self.t_cost = t_cost
         self.init_holdings = {s:0 for s in self.stocks}
 
+        print(f'self.dates: {self.dates}')
+
         if isinstance(alpha, (list, tuple)):
             self.alpha = alpha[0]
             self.alpha_list = list(alpha)
@@ -119,6 +121,7 @@ class SinglePeriod:
         elif dates or self.dates:
             if dates:
                 self.dates = dates
+            print(self.dates)
 
             print(f"\nLoading live data from the web from Yahoo! finance",
                   f"from {self.dates[0]} to {self.dates[1]}...")
@@ -140,6 +143,8 @@ class SinglePeriod:
 
             for i in self.stocks:
                 self.df_all[i] = panel_data[[('Adj Close',  i)]]
+            self.rolling_avg = self.df_all.rolling(window=1).mean()
+            self.rolling_avg.reset_index(inplace=True)
 
             # Read in baseline data; resample to monthly
             index_df = DataReader(self.baseline, 'yahoo',
@@ -182,7 +187,7 @@ class SinglePeriod:
         self.avg_monthly_returns = self.monthly_returns.mean(axis=0)
         self.covariance_matrix = self.monthly_returns.cov()
 
-    def build_cqm(self, max_risk=None, min_return=None, init_holdings=None):
+    def build_cqm(self, max_risk=None, min_return=None, init_holdings=None, idx=0):
         """Build and store a CQM.
         This method allows the user a choice of 3 problem formulations:
             1) max return - alpha*risk (default formulation)
@@ -214,7 +219,8 @@ class SinglePeriod:
         print(f'avg_monthly_returns: {self.avg_monthly_returns}')
         returns = 0
         for s in self.stocks:
-            returns = returns + self.price[s] * self.avg_monthly_returns[s] * x[s]
+#            returns = returns + self.price[s] * self.avg_monthly_returns[s] * x[s]
+            returns = returns + self.price[s] * self.rolling_avg.loc[idx, s] * x[s]
 
         # Adding budget and related constraints
         if not init_holdings:
@@ -252,10 +258,13 @@ class SinglePeriod:
 
             # indicator constraints
             for s in self.stocks:
+                print(f'stock {s}')
                 cqm.add_constraint(x[s] - x0[s]*y[s] >= 0,
                                    label=f'indicator_constraint_gte_{s}')
+                print(f'indicator_constraint_gte: {x[s] - x0[s]*y[s]} >= 0')
                 cqm.add_constraint(x[s] - x[s]*y[s] <= x0[s],
                                    label=f'indicator_constraint_lte_{s}')
+                print(f'indicator_constraint_lte: {x[s] - x[s]*y[s]} < {x0[s]}')
 
         if max_risk:
             # Adding maximum risk constraint
@@ -277,7 +286,7 @@ class SinglePeriod:
 
         self.model['CQM'] = cqm
 
-    def solve_cqm(self, max_risk=None, min_return=None, init_holdings=None):
+    def solve_cqm(self, max_risk=None, min_return=None, init_holdings=None, idx=0):
         """Solve CQM.
         This method allows the user to solve one of 3 cqm problem formulations:
             1) max return - alpha*risk (default formulation)
@@ -291,7 +300,7 @@ class SinglePeriod:
             solution (dict): This is a dictionary that saves solutions in desired format
                 e.g., solution = {'stocks': {'IBM': 3, 'WMT': 12}, 'risk': 10, 'return': 20}
         """
-        self.build_cqm(max_risk, min_return, init_holdings)
+        self.build_cqm(max_risk, min_return, init_holdings, idx=idx)
 
         self.sample_set['CQM'] = self.sampler['CQM'].sample_cqm(self.model['CQM'], label="Run 16")
         n_samples = len(self.sample_set['CQM'].record)

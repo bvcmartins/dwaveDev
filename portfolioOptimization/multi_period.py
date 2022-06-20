@@ -61,9 +61,10 @@ class MultiPeriod(SinglePeriod):
             min_return (int): Minimum return for the CQM return bounding formulation.
         """
         if not self.dates:
-            self.dates = ['2010-01-01', '2012-12-31']
+            #self.dates = ['2010-01-01', '2012-12-31']
             #self.dates = ['2019-01-01', '2022-05-01']
             #self.dates = ['2010-01-01', '2010-06-01']
+            self.dates = ['2018-10-01', '2019-02-01']
         self.load_data()
 
         num_months = len(self.df_all)
@@ -73,7 +74,7 @@ class MultiPeriod(SinglePeriod):
         self.baseline_values = [0]
         self.update_values = [0]
         months = []
-        self.t_cost = 0.01
+        #self.t_cost = 0.01
 
         # Define dataframe to save output data
         headers = ['Date', 'Value'] + self.stocks + ['Variance', 'Returns']
@@ -81,6 +82,8 @@ class MultiPeriod(SinglePeriod):
         row = []
 
         self.price_df = pd.DataFrame(columns=self.stocks)
+
+        print('end of simulation')
 
         # Initialize the plot
         plt.ylim(ymax = 1.5*self.budget, ymin = -1.5*self.budget)
@@ -155,7 +158,7 @@ class MultiPeriod(SinglePeriod):
 
                 self.solution['CQM'] = self.solve_cqm(max_risk=max_risk,
                                                       min_return=min_return,
-                                                      init_holdings=init_holdings)
+                                                      init_holdings=init_holdings, idx=i)
                 result = self.solution['CQM']
                 init_holdings = result['stocks']
 
