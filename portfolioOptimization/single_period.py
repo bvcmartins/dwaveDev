@@ -31,7 +31,8 @@ class SinglePeriod:
     def __init__(self, stocks=('AAPL', 'MSFT', 'AAL', 'WMT'), budget=1000,
                  bin_size=None, gamma=None, file_path='data/basic_data.csv',
                  dates=None, model_type='CQM', alpha=0.005, baseline='^GSPC',
-                 sampler_args=None, t_cost=0.01, verbose=True):
+                 sampler_args=None, t_cost=0.01, verbose=True,
+                 label='PortOpt', init_holdings=None):
         """Class constructor.
         Args:
             stocks (list of str): List of stocks.
@@ -62,7 +63,12 @@ class SinglePeriod:
         self.baseline = [baseline]
         self.verbose = verbose
         self.t_cost = t_cost
-        self.init_holdings = {s:0 for s in self.stocks}
+        if init_holdings:
+            self.init_holdings = init_holdings
+        else:
+            self.init_holdings = {s:0 for s in self.stocks}
+        self.label = label
+        print(f'init_holdings: {init_holdings}')
 
         print(f'self.dates: {self.dates}')
 
@@ -118,6 +124,32 @@ class SinglePeriod:
             print("\nLoading data from DataFrame...")
             self.df = df
             self.stocks = df.columns.tolist()
+        elif file_path is not None:
+            print("\nLoading data from provided CSV file...")
+            self.file_path = file_path
+            self.df = pd.read_csv(self.file_path, index_col=0)
+            self.df = self.df.set_index('Date')
+            for column in self.df.columns:
+                if column != 'Date':
+                    self.df[column] = self.df[column].astype(np.float32)
+                else:
+                    self.df[column] = pd.to_datetime(self.df[column])
+            print(f'types: {self.df.dtypes}')
+            self.df_all = self.df.copy()
+            #self.df_all.index = pd.to_datetime(self.df_all.index)
+
+            self.rolling_avg = self.df_all.rolling(window=1).mean()
+            self.rolling_avg.reset_index(inplace=True)
+            print(f'df_all: {self.df_all.head()}')
+            # Read in baseline data; resample to monthly
+            index_df = DataReader(self.baseline, 'yahoo',
+                                  self.dates[0], self.dates[1])
+            index_df = index_df.resample('BM').last()
+            self.df_baseline = pd.DataFrame(index=index_df.index,
+                                            columns=self.baseline)
+            for i in self.baseline:
+                self.df_baseline[i] = index_df[[('Adj Close',  i)]]
+            print(f"Baseline: {self.df_baseline.head()}")
         elif dates or self.dates:
             if dates:
                 self.dates = dates
@@ -158,14 +190,13 @@ class SinglePeriod:
 
             self.df = self.df_all
         else:
-            print("\nLoading data from provided CSV file...")
-            if file_path:
-                self.file_path = file_path
+            print('No data loaded')
+            exit()
 
-            self.df = pd.read_csv(self.file_path, index_col=0)
+        #self.init_holdings = {s:0 for s in self.stocks}
 
-        self.init_holdings = {s:0 for s in self.stocks}
-
+        print(f'budget: {self.budget}')
+        print(f'self.df.iloc[-1]: {self.df.iloc[-1]}')
         self.max_num_shares = (self.budget/self.df.iloc[-1]).astype(int)
         if self.verbose:
             print("\nMax shares we can afford with a budget of", self.budget)
@@ -187,7 +218,7 @@ class SinglePeriod:
         self.avg_monthly_returns = self.monthly_returns.mean(axis=0)
         self.covariance_matrix = self.monthly_returns.cov()
 
-    def build_cqm(self, max_risk=None, min_return=None, init_holdings=None, idx=0):
+    def build_cqm(self, max_risk=None, min_return=None, idx=0):
         """Build and store a CQM.
         This method allows the user a choice of 3 problem formulations:
             1) max return - alpha*risk (default formulation)
@@ -223,10 +254,10 @@ class SinglePeriod:
             returns = returns + self.price[s] * self.rolling_avg.loc[idx, s] * x[s]
 
         # Adding budget and related constraints
-        if not init_holdings:
-            init_holdings = self.init_holdings
-        else:
-            self.init_holdings = init_holdings
+        # if not init_holdings:
+        #     init_holdings = self.init_holdings
+        # else:
+        #     self.init_holdings = init_holdings
 
         if not self.t_cost:
             print('not t_cost')
@@ -238,7 +269,7 @@ class SinglePeriod:
             print('yes t_cost')
             print(f't_cost: {self.t_cost}')
             # Modeling transaction cost
-            x0 = init_holdings
+            x0 = self.init_holdings
             print(f'initial_holdings: {x0}')
 
             y = {s: Binary("Y[%s]" %s) for s in self.stocks}
@@ -286,7 +317,7 @@ class SinglePeriod:
 
         self.model['CQM'] = cqm
 
-    def solve_cqm(self, max_risk=None, min_return=None, init_holdings=None, idx=0):
+    def solve_cqm(self, max_risk=None, min_return=None,  idx=0):
         """Solve CQM.
         This method allows the user to solve one of 3 cqm problem formulations:
             1) max return - alpha*risk (default formulation)
@@ -300,9 +331,9 @@ class SinglePeriod:
             solution (dict): This is a dictionary that saves solutions in desired format
                 e.g., solution = {'stocks': {'IBM': 3, 'WMT': 12}, 'risk': 10, 'return': 20}
         """
-        self.build_cqm(max_risk, min_return, init_holdings, idx=idx)
+        self.build_cqm(max_risk, min_return, idx=idx)
 
-        self.sample_set['CQM'] = self.sampler['CQM'].sample_cqm(self.model['CQM'], label="Run 16")
+        self.sample_set['CQM'] = self.sampler['CQM'].sample_cqm(self.model['CQM'], label=self.label)
         n_samples = len(self.sample_set['CQM'].record)
         print(f'n_samples: {n_samples}')
 
@@ -519,7 +550,7 @@ class SinglePeriod:
 
         return round(est_return, 2), round(variance, 2)
 
-    def run(self, min_return=0, max_risk=0, num=0, init_holdings=None):
+    def run(self, min_return=0, max_risk=0, num=0):
         """Execute sequence of load_data --> build_model --> solve.
         Args:
             max_risk (int): Maximum risk for the risk bounding formulation.
@@ -532,7 +563,7 @@ class SinglePeriod:
             print(f"\nCQM run...")
             self.solution['CQM'] = self.solve_cqm(min_return=min_return,
                                                   max_risk=max_risk,
-                                                  init_holdings=init_holdings)
+                                                  init_holdings=self.init_holdings)
         else:
             print(f"\nDQM run...")
             if len(self.alpha_list) > 1 or len(self.gamma_list) > 1:

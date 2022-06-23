@@ -29,7 +29,8 @@ class MultiPeriod(SinglePeriod):
     def __init__(self, stocks=('AAPL', 'MSFT', 'AAL', 'WMT'), budget=1000,
                  bin_size=None, gamma=None, file_path=None,
                  dates=None, model_type='CQM', alpha=0.005, baseline='^GSPC',
-                 sampler_args=None, t_cost=0.01, verbose=True):
+                 sampler_args=None, t_cost=0.01, verbose=True, label='Run',
+                 init_holdings=None):
         """Class constructor.
         Args:
             stocks (list of str): List of stocks.
@@ -52,9 +53,10 @@ class MultiPeriod(SinglePeriod):
         super().__init__(stocks=stocks, budget=budget, t_cost=t_cost,
                          bin_size=bin_size, gamma=gamma, file_path=file_path,
                          dates=dates, model_type=model_type, alpha=alpha,
-                         baseline=baseline, sampler_args=sampler_args, verbose=verbose)
+                         baseline=baseline, sampler_args=sampler_args,
+                         verbose=verbose, label=label, init_holdings=init_holdings)
 
-    def run(self, max_risk=0, min_return=0, num=0, init_holdings=None):
+    def run(self, max_risk=0, min_return=0, num=0):
         """Solve the rebalancing portfolio optimization problem.
         Args:
             max_risk (int): Maximum risk for the CQM risk bounding formulation.
@@ -65,7 +67,7 @@ class MultiPeriod(SinglePeriod):
             #self.dates = ['2019-01-01', '2022-05-01']
             #self.dates = ['2010-01-01', '2010-06-01']
             self.dates = ['2018-10-01', '2019-02-01']
-        self.load_data()
+        self.load_data(file_path=self.file_path)
 
         num_months = len(self.df_all)
         first_purchase = True
@@ -83,8 +85,6 @@ class MultiPeriod(SinglePeriod):
 
         self.price_df = pd.DataFrame(columns=self.stocks)
 
-        print('end of simulation')
-
         # Initialize the plot
         plt.ylim(ymax = 1.5*self.budget, ymin = -1.5*self.budget)
         plt.xticks(list(range(0, num_months, 2)),
@@ -94,14 +94,19 @@ class MultiPeriod(SinglePeriod):
                  color='red', label="Break-even", linewidth=0.5)
 
         print(f'num_months: {num_months}')
+        print(f'df all shape: {self.df_all.shape}')
         for i in range(3, num_months):
 
             # Look at just the data up to the current month
             df = self.df_all.iloc[0:i+1,:].copy()
+            print(f'df select:{df}')
             df.to_pickle(f'df_{i}.pkl')
             baseline_df_current = self.df_baseline.iloc[0:i+1,:]
             print("\nDate:", df.last_valid_index())
+            df.index = pd.to_datetime(df.index)
+            print(f'df: {df}')
             months.append(df.last_valid_index().date())
+            #months.append(df.last_valid_index())
 
             if first_purchase:
                 budget = self.budget
@@ -134,9 +139,12 @@ class MultiPeriod(SinglePeriod):
 
             if first_purchase:
                 plt.legend(loc="lower left")
+                #plt.title("Start: {start}, End: {end}".format \
+                #              (start=self.df_all.first_valid_index().date(),
+                #               end=self.df_all.last_valid_index().date()))
                 plt.title("Start: {start}, End: {end}".format \
-                              (start=self.df_all.first_valid_index().date(),
-                               end=self.df_all.last_valid_index().date()))
+                              (start=self.df_all.first_valid_index(),
+                               end=self.df_all.last_valid_index()))
 
             plt.savefig("portfolio.png")
             plt.pause(0.05)
@@ -158,9 +166,9 @@ class MultiPeriod(SinglePeriod):
 
                 self.solution['CQM'] = self.solve_cqm(max_risk=max_risk,
                                                       min_return=min_return,
-                                                      init_holdings=init_holdings, idx=i)
+                                                      idx=i)
                 result = self.solution['CQM']
-                init_holdings = result['stocks']
+                self.init_holdings = result['stocks']
 
             result_df = pd.DataFrame(result)
             result_df.to_pickle(f'result_df_{i}.pkl')

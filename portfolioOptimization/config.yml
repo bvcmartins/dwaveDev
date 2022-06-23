@@ -1,6 +1,5 @@
-stocks: ['MRO', 'DVN', 'NUE', 'APA', 'OXY', 'AAPL', 'MOS', 'COP', 'EOG', 'CF', 'FANG', 'VLO', 'HAL', 'MPC', 'FTNT', 'PXD', 'XOM', 'HES', 'CVX', 'IT', 'SLB', 'ADM', 'MCK', 'AZO', 'EXR', 'BBWI', 'BKR', 'ANTM', 'PWR', 'OKE', 'IRM', 'WMB', 'PSA', 'FCX', 'NVDA', 'LYV', 'CTRA', 'DLTR', 'WRB', 'KR', 'GD', 'AIG', 'EXC', 'ANET', 'PLD', 'HPQ', 'SBNY', 'CPT', 'KIM', 'NOC']
-stocks:
-dates: ['2021-01-01', '2022-05-01']
+stocks: ['MMM', 'AOS', 'ABT', 'ABBV', 'ABMD', 'ACN', 'ATVI', 'ADM', 'ADBE', 'ADP', 'AAP', 'AES', 'AFL', 'A', 'APD', 'AKAM', 'ALK', 'ALB', 'ARE', 'ALGN', 'ALLE', 'LNT', 'ALL', 'GOOGL', 'GOOG', 'MO', 'AMZN', 'AMCR', 'AMD', 'AEE', 'AAL', 'AEP', 'AXP', 'AIG', 'AMT', 'AWK', 'AMP', 'ABC', 'AME', 'AMGN', 'APH', 'ADI', 'ANSS', 'ANTM', 'AON', 'APA', 'AAPL', 'AMAT', 'APTV', 'ANET', 'AJG', 'AIZ', 'T', 'ATO', 'ADSK', 'AZO', 'AVB', 'AVY', 'BKR', 'BALL', 'BAC', 'BBWI', 'BAX', 'BDX', 'WRB', 'BBY', 'BIO', 'TECH', 'BIIB', 'BLK', 'BK', 'BA', 'BKNG', 'BWA', 'BXP', 'BSX', 'BMY', 'AVGO', 'BR', 'BRO', 'CHRW', 'CDNS', 'CZR', 'CPT', 'CPB', 'COF', 'CAH', 'KMX', 'CCL', 'CTLT', 'CAT', 'CBOE', 'CBRE', 'CDW', 'CE', 'CNC', 'CNP', 'CDAY', 'CF', 'CRL']
+dates: ['2018-10-01', '2020-01-01']
 budget: 1000
 bin_size:
 gamma:
@@ -15,3 +14,5 @@ sampler_args:
 verbose: True
 num: 0
 t_cost: 0.01
+label: 'Run 32'
+init_holdings:

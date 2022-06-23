@@ -84,6 +84,8 @@ def main(*args, **params):
     alpha = params['alpha']
     verbose = params['verbose']
     baseline = params['baseline']
+    label = params['label']
+    init_holdings = params['init_holdings']
 
     if ((max_risk or min_return) and model_type != 'CQM'):
         raise Exception("The bound options require a CQM.")
@@ -98,8 +100,8 @@ def main(*args, **params):
         raise Exception("The transaction cost option requires a CQM. " \
                         "Set t_cost=0 for DQM.")
 
-    print(f'dates: {params["dates"]}')
-    print(f'params: {params}')
+    # print(f'dates: {params["dates"]}')
+    # print(f'params: {params}')
 
     if params['rebalance']:
         print(f"\nRebalancing portfolio optimization run...")
@@ -115,7 +117,9 @@ def main(*args, **params):
                                    alpha=params['alpha'],
                                    verbose=params['verbose'],
                                    baseline=params['baseline'],
-                                   t_cost=params['t_cost'])
+                                   t_cost=params['t_cost'],
+                                   label=params['label'],
+                                   init_holdings=params['init_holdings'])
     else:
         print(f"\nSingle period portfolio optimization run...")
 
@@ -129,7 +133,9 @@ def main(*args, **params):
                                     alpha=params['alpha'],
                                     verbose=params['verbose'],
                                     sampler_args=params['sampler_args'],
-                                    t_cost=params['t_cost'])
+                                    t_cost=params['t_cost'],
+                                    label=params['label'],
+                                    init_holdings=params['init_holdings'])
 
     my_portfolio.run(min_return=min_return, max_risk=max_risk, num=num)
 

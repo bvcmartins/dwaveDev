@@ -260,6 +260,41 @@ WMT       4
   * 50 stocks selected for ['2021-01-01', '2022-05-01'] ran instead for ['2018-10-01', '2020-01-01']
   * below baseline
 ---
+### Run 28
+  * 50 top stocks
+  * ['2021-01-01', '2022-05-01']
+  * rolling avg
+  * checking effects of market downturn
+  * below baseline in the end
+---
+### Run 29
+  * full S&P 500 (493 stocks excluding the ones with NaNs during the period)
+  * ['2018-10-01', '2020-01-01']
+  * loaded from file_path
+  * below baseline
+---
+### Run 30
+  *  full S&P 500 (493 stocks excluding the ones with NaNs during the period)
+  * ['2018-10-01', '2020-01-01']
+  * loaded from file_path
+  * Initial budget = 77,000
+  * generated initial portfolio using volumes on 2018-10-31
+  * result must be scaled to compare with GSPC
+---
+### Run 31
+  * similar to run 25
+  * ['2018-10-01', '2020-01-01']
+  * 50 top stocks
+  * budget = 100,000
+  * no initial portfolio
+---
+### Run 32
+  * 100 top stocks
+  * ['2018-10-01', '2020-01-01']
+  * no initial portfolio
+  * budget = 1000
+---
+
 Questions
 
 - Portfolio optimization

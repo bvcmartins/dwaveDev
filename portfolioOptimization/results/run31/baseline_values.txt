@@ -1,0 +1,22 @@
+[0 ^GSPC    2972.888934
+   Name: 2019-01-31 00:00:00, dtype: float64
+ ^GSPC    4818.601382
+ Name: 2019-01-31 00:00:00, dtype: float64
+ ^GSPC    8939.387291
+ Name: 2019-01-31 00:00:00, dtype: float64
+ ^GSPC    1773.601539
+ Name: 2019-01-31 00:00:00, dtype: float64
+ ^GSPC    8788.872583
+ Name: 2019-01-31 00:00:00, dtype: float64
+ ^GSPC    10217.069457
+ Name: 2019-01-31 00:00:00, dtype: float64
+ ^GSPC    8223.063321
+ Name: 2019-01-31 00:00:00, dtype: float64
+ ^GSPC    10082.463028
+ Name: 2019-01-31 00:00:00, dtype: float64
+ ^GSPC    12331.64265
+ Name: 2019-01-31 00:00:00, dtype: float64
+ ^GSPC    16156.202324
+ Name: 2019-01-31 00:00:00, dtype: float64
+ ^GSPC    19477.087113
+ Name: 2019-01-31 00:00:00, dtype: float64]
