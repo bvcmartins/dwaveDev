@@ -28,9 +28,9 @@ class MultiPeriod(SinglePeriod):
     """
     def __init__(self, stocks=('AAPL', 'MSFT', 'AAL', 'WMT'), budget=1000,
                  bin_size=None, gamma=None, file_path=None,
-                 dates=None, model_type='CQM', alpha=0.005, baseline='^GSPC',
+                 dates=None, model_type='CQM', alpha=0.005, baseline=None,
                  sampler_args=None, t_cost=0.01, verbose=True, label='Run',
-                 init_holdings=None):
+                 init_holdings=None, window_size=1):
         """Class constructor.
         Args:
             stocks (list of str): List of stocks.
@@ -54,7 +54,7 @@ class MultiPeriod(SinglePeriod):
                          bin_size=bin_size, gamma=gamma, file_path=file_path,
                          dates=dates, model_type=model_type, alpha=alpha,
                          baseline=baseline, sampler_args=sampler_args,
-                         verbose=verbose, label=label, init_holdings=init_holdings)
+                         verbose=verbose, label=label, init_holdings=init_holdings, window_size=window_size)
 
     def run(self, max_risk=0, min_return=0, num=0):
         """Solve the rebalancing portfolio optimization problem.
@@ -86,12 +86,13 @@ class MultiPeriod(SinglePeriod):
         self.price_df = pd.DataFrame(columns=self.stocks)
 
         # Initialize the plot
-        plt.ylim(ymax = 1.5*self.budget, ymin = -1.5*self.budget)
-        plt.xticks(list(range(0, num_months, 2)),
-                   self.df_baseline.index.strftime('%b')[::2], rotation='vertical')
-        plt.locator_params(axis='x', nbins=num_months/2)
-        plt.plot(list(range(0, num_months)), [0]*(num_months),
-                 color='red', label="Break-even", linewidth=0.5)
+        if self.baseline[0] is not None:
+            plt.ylim(ymax = 1.5*self.budget, ymin = -1.5*self.budget)
+            plt.xticks(list(range(0, num_months, 2)),
+                       self.df_baseline.index.strftime('%b')[::2], rotation='vertical')
+            plt.locator_params(axis='x', nbins=num_months/2)
+            plt.plot(list(range(0, num_months)), [0]*(num_months),
+                     color='red', label="Break-even", linewidth=0.5)
 
         print(f'num_months: {num_months}')
         print(f'df all shape: {self.df_all.shape}')
@@ -101,7 +102,8 @@ class MultiPeriod(SinglePeriod):
             df = self.df_all.iloc[0:i+1,:].copy()
             print(f'df select:{df}')
             df.to_pickle(f'df_{i}.pkl')
-            baseline_df_current = self.df_baseline.iloc[0:i+1,:]
+            if self.baseline[0] is not None:
+                baseline_df_current = self.df_baseline.iloc[0:i+1,:]
             print("\nDate:", df.last_valid_index())
             df.index = pd.to_datetime(df.index)
             print(f'df: {df}')
@@ -111,17 +113,19 @@ class MultiPeriod(SinglePeriod):
             if first_purchase:
                 budget = self.budget
                 initial_budget = self.budget
-                baseline_shares = (budget / baseline_df_current.iloc[-1])
-                baseline_result = {self.baseline[0]: baseline_shares}
+                if self.baseline[0] is not None:
+                    baseline_shares = (budget / baseline_df_current.iloc[-1])
+                    baseline_result = {self.baseline[0]: baseline_shares}
             else:
                 # Compute profit of current portfolio
                 budget = sum([df.iloc[-1][s]*result['stocks'][s] for s in self.stocks])
                 self.update_values.append(budget - initial_budget)
 
                 # Compute profit of fund portfolio
-                fund_value = sum([baseline_df_current.iloc[-1][s]*baseline_result[s]
+                if self.baseline[0] is not None:
+                    fund_value = sum([baseline_df_current.iloc[-1][s]*baseline_result[s]
                                   for s in self.baseline])
-                self.baseline_values.append(fund_value - initial_budget)
+                    self.baseline_values.append(fund_value - initial_budget)
 
                 self.budget = budget
 
@@ -131,23 +135,24 @@ class MultiPeriod(SinglePeriod):
 
             # Output for user on command-line and plot
             update_values = np.array(self.update_values, dtype=object)
-            baseline_values = np.array(self.baseline_values, dtype=object)
-            plt.plot(range(3, i+1), update_values,
-                     color='blue', label="Optimized portfolio")
-            plt.plot(range(3, i+1), baseline_values,
-                     color='gray', label="Fund portfolio", linewidth=0.5)
+            if self.baseline[0] is not None:
+                baseline_values = np.array(self.baseline_values, dtype=object)
+                plt.plot(range(3, i+1), update_values,
+                         color='blue', label="Optimized portfolio")
+                plt.plot(range(3, i+1), baseline_values,
+                         color='gray', label="Fund portfolio", linewidth=0.5)
 
-            if first_purchase:
-                plt.legend(loc="lower left")
-                #plt.title("Start: {start}, End: {end}".format \
-                #              (start=self.df_all.first_valid_index().date(),
-                #               end=self.df_all.last_valid_index().date()))
-                plt.title("Start: {start}, End: {end}".format \
-                              (start=self.df_all.first_valid_index(),
-                               end=self.df_all.last_valid_index()))
+                if first_purchase:
+                    plt.legend(loc="lower left")
+                    #plt.title("Start: {start}, End: {end}".format \
+                    #              (start=self.df_all.first_valid_index().date(),
+                    #               end=self.df_all.last_valid_index().date()))
+                    plt.title("Start: {start}, End: {end}".format \
+                                  (start=self.df_all.first_valid_index(),
+                                   end=self.df_all.last_valid_index()))
 
-            plt.savefig("portfolio.png")
-            plt.pause(0.05)
+                plt.savefig("portfolio.png")
+                plt.pause(0.05)
 
             # Making solve run
             if self.model_type == 'DQM':
@@ -193,14 +198,17 @@ class MultiPeriod(SinglePeriod):
         f.write(str(update_values))
         f.close()
 
-        f = open("baseline_values.txt","w")
-        f.write(str(baseline_values))
-        f.close()
+        if self.baseline[0] is not None:
+            f = open("baseline_values.txt","w")
+            f.write(str(baseline_values))
+            f.close()
 
         self.opt_results_df.to_pickle('opt_results_df.pkl')
         self.df_all.to_pickle('df_all.pkl')
-        self.df_baseline.to_pickle('df_baseline.pkl')
+        if self.baseline[0] is not None:
+            self.df_baseline.to_pickle('df_baseline.pkl')
         self.price_df.to_pickle('price_df.pkl')
 
-        plt.savefig("portfolio.png")
-        plt.show(block=False)
+        if self.baseline[0] is not None:
+            plt.savefig("portfolio.png")
+            plt.show(block=False)

@@ -30,9 +30,9 @@ class SinglePeriod:
     """
     def __init__(self, stocks=('AAPL', 'MSFT', 'AAL', 'WMT'), budget=1000,
                  bin_size=None, gamma=None, file_path='data/basic_data.csv',
-                 dates=None, model_type='CQM', alpha=0.005, baseline='^GSPC',
+                 dates=None, model_type='CQM', alpha=0.005, baseline=None,
                  sampler_args=None, t_cost=0.01, verbose=True,
-                 label='PortOpt', init_holdings=None):
+                 label='PortOpt', init_holdings=None, window_size=1):
         """Class constructor.
         Args:
             stocks (list of str): List of stocks.
@@ -63,6 +63,7 @@ class SinglePeriod:
         self.baseline = [baseline]
         self.verbose = verbose
         self.t_cost = t_cost
+        self.window_size = window_size
         if init_holdings:
             self.init_holdings = init_holdings
         else:
@@ -127,8 +128,9 @@ class SinglePeriod:
         elif file_path is not None:
             print("\nLoading data from provided CSV file...")
             self.file_path = file_path
+            print(f'file: {self.file_path}')
             self.df = pd.read_csv(self.file_path, index_col=0)
-            self.df = self.df.set_index('Date')
+            #self.df = self.df.set_index('Date')
             for column in self.df.columns:
                 if column != 'Date':
                     self.df[column] = self.df[column].astype(np.float32)
@@ -142,14 +144,23 @@ class SinglePeriod:
             self.rolling_avg.reset_index(inplace=True)
             print(f'df_all: {self.df_all.head()}')
             # Read in baseline data; resample to monthly
-            index_df = DataReader(self.baseline, 'yahoo',
+
+            if self.baseline[0] is not None:
+                print(f'inside baseline: {self.baseline is None}')
+                print(f'none type: {type(self.baseline)}')
+                print(f'baseline: {self.baseline}')
+                index_df = DataReader(self.baseline, 'yahoo',
                                   self.dates[0], self.dates[1])
-            index_df = index_df.resample('BM').last()
-            self.df_baseline = pd.DataFrame(index=index_df.index,
+                index_df = index_df.resample('BM').last()
+
+
+                self.df_baseline = pd.DataFrame(index=index_df.index,
                                             columns=self.baseline)
-            for i in self.baseline:
-                self.df_baseline[i] = index_df[[('Adj Close',  i)]]
-            print(f"Baseline: {self.df_baseline.head()}")
+
+                for i in self.baseline:
+                    self.df_baseline[i] = index_df[[('Adj Close',  i)]]
+                print(f"Baseline: {self.df_baseline.head()}")
+
         elif dates or self.dates:
             if dates:
                 self.dates = dates
@@ -158,13 +169,13 @@ class SinglePeriod:
             print(f"\nLoading live data from the web from Yahoo! finance",
                   f"from {self.dates[0]} to {self.dates[1]}...")
 
-            # Generating randomn list of stocks
-            if num > 0:
-                if (self.dates[0] < '2010-01-01'):
-                    raise Exception(f"Start date must be >= '2010-01-01' "
-                                    f"when using option 'num'.")
-                symbols_df = pd.read_csv('data/stocks_symbols.csv')
-                self.stocks = random.sample(list(symbols_df.loc[:,'Symbol']), num)
+            # Generating random list of stocks
+            # if num > 0:
+            #     if (self.dates[0] < '2010-01-01'):
+            #         raise Exception(f"Start date must be >= '2010-01-01' "
+            #                         f"when using option 'num'.")
+            #     symbols_df = pd.read_csv('data/stocks_symbols.csv')
+            #     self.stocks = random.sample(list(symbols_df.loc[:,'Symbol']), num)
 
             # Read in daily data; resample to monthly
             panel_data = DataReader(self.stocks, 'yahoo',
@@ -175,29 +186,34 @@ class SinglePeriod:
 
             for i in self.stocks:
                 self.df_all[i] = panel_data[[('Adj Close',  i)]]
-            self.rolling_avg = self.df_all.rolling(window=1).mean()
+            self.rolling_avg = self.df_all.rolling(window=self.window_size).mean()
             self.rolling_avg.reset_index(inplace=True)
-
+            #
             # Read in baseline data; resample to monthly
-            index_df = DataReader(self.baseline, 'yahoo',
-                                  self.dates[0], self.dates[1])
-            index_df = index_df.resample('BM').last()
-            self.df_baseline = pd.DataFrame(index=index_df.index,
-                                            columns=self.baseline)
+            if self.baseline[0] is not None:
+                index_df = DataReader(self.baseline, 'yahoo',
+                                      self.dates[0], self.dates[1])
+                index_df = index_df.resample('BM').last()
+                self.df_baseline = pd.DataFrame(index=index_df.index,
+                                                columns=self.baseline)
 
-            for i in self.baseline:
-                self.df_baseline[i] = index_df[[('Adj Close',  i)]]
+                for i in self.baseline:
+                    self.df_baseline[i] = index_df[[('Adj Close',  i)]]
 
             self.df = self.df_all
         else:
             print('No data loaded')
             exit()
 
-        #self.init_holdings = {s:0 for s in self.stocks}
-
         print(f'budget: {self.budget}')
         print(f'self.df.iloc[-1]: {self.df.iloc[-1]}')
-        self.max_num_shares = (self.budget/self.df.iloc[-1]).astype(int)
+        try:
+            self.max_num_shares = (self.budget/self.df.iloc[-1]).astype(int)
+        except Exception as e:
+            print('Exception')
+            print(f'{self.budget/self.df.iloc[-1]}')
+            print(f'self.df.iloc[-1]: {self.df.iloc[-1].values.tolist()}')
+            exit()
         if self.verbose:
             print("\nMax shares we can afford with a budget of", self.budget)
             print(self.max_num_shares.to_string())

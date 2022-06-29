@@ -86,6 +86,7 @@ def main(*args, **params):
     baseline = params['baseline']
     label = params['label']
     init_holdings = params['init_holdings']
+    window_size = params['window_size']
 
     if ((max_risk or min_return) and model_type != 'CQM'):
         raise Exception("The bound options require a CQM.")
@@ -119,7 +120,8 @@ def main(*args, **params):
                                    baseline=params['baseline'],
                                    t_cost=params['t_cost'],
                                    label=params['label'],
-                                   init_holdings=params['init_holdings'])
+                                   init_holdings=params['init_holdings'],
+                                   window_size=params['window_size'])
     else:
         print(f"\nSingle period portfolio optimization run...")
 
@@ -135,7 +137,8 @@ def main(*args, **params):
                                     sampler_args=params['sampler_args'],
                                     t_cost=params['t_cost'],
                                     label=params['label'],
-                                    init_holdings=params['init_holdings'])
+                                    init_holdings=params['init_holdings'],
+                                    window_size=params['window_size'])
 
     my_portfolio.run(min_return=min_return, max_risk=max_risk, num=num)
 
