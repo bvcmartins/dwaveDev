@@ -30,7 +30,7 @@ class MultiPeriod(SinglePeriod):
                  bin_size=None, gamma=None, file_path=None,
                  dates=None, model_type='CQM', alpha=0.005, baseline='^GSPC',
                  sampler_args=None, t_cost=0.01, verbose=True, label='Run',
-                 init_holdings=None):
+                 init_holdings=None, window_size=1):
         """Class constructor.
         Args:
             stocks (list of str): List of stocks.
@@ -54,7 +54,8 @@ class MultiPeriod(SinglePeriod):
                          bin_size=bin_size, gamma=gamma, file_path=file_path,
                          dates=dates, model_type=model_type, alpha=alpha,
                          baseline=baseline, sampler_args=sampler_args,
-                         verbose=verbose, label=label, init_holdings=init_holdings)
+                         verbose=verbose, label=label, init_holdings=init_holdings,
+                         window_size=window_size)
 
     def run(self, max_risk=0, min_return=0, num=0):
         """Solve the rebalancing portfolio optimization problem.

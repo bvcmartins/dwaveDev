@@ -32,7 +32,7 @@ class SinglePeriod:
                  bin_size=None, gamma=None, file_path='data/basic_data.csv',
                  dates=None, model_type='CQM', alpha=0.005, baseline='^GSPC',
                  sampler_args=None, t_cost=0.01, verbose=True,
-                 label='PortOpt', init_holdings=None):
+                 label='PortOpt', init_holdings=None, window_size=1):
         """Class constructor.
         Args:
             stocks (list of str): List of stocks.
@@ -63,6 +63,7 @@ class SinglePeriod:
         self.baseline = [baseline]
         self.verbose = verbose
         self.t_cost = t_cost
+        self.window_size = window_size
         if init_holdings:
             self.init_holdings = init_holdings
         else:
@@ -175,7 +176,7 @@ class SinglePeriod:
 
             for i in self.stocks:
                 self.df_all[i] = panel_data[[('Adj Close',  i)]]
-            self.rolling_avg = self.df_all.rolling(window=1).mean()
+            self.rolling_avg = self.df_all.rolling(window=self.window_size).mean()
             self.rolling_avg.reset_index(inplace=True)
 
             # Read in baseline data; resample to monthly
