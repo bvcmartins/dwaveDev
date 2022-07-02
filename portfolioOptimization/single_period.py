@@ -128,7 +128,7 @@ class SinglePeriod:
             print("\nLoading data from provided CSV file...")
             self.file_path = file_path
             self.df = pd.read_csv(self.file_path, index_col=0)
-            self.df = self.df.set_index('Date')
+            #self.df = self.df.set_index('Date')
             for column in self.df.columns:
                 if column != 'Date':
                     self.df[column] = self.df[column].astype(np.float32)
@@ -179,6 +179,7 @@ class SinglePeriod:
             self.rolling_avg.reset_index(inplace=True)
 
             # Read in baseline data; resample to monthly
+            print(f'initial date: {self.dates[0]}')
             index_df = DataReader(self.baseline, 'yahoo',
                                   self.dates[0], self.dates[1])
             index_df = index_df.resample('BM').last()
@@ -259,12 +260,19 @@ class SinglePeriod:
         # else:
         #     self.init_holdings = init_holdings
 
+
         if not self.t_cost:
             print('not t_cost')
             cqm.add_constraint(quicksum([x[s]*self.price[s] for s in self.stocks])
                                <= self.budget, label='upper_budget')
             cqm.add_constraint(quicksum([x[s]*self.price[s] for s in self.stocks])
                                >= 0.997*self.budget, label='lower_budget')
+
+            ## New section
+            #y = {s: Binary("Y[%s]" %s) for s in self.stocks}
+            #for s in self.stocks:
+            #    cqm.add_constraint(quicksum(y[s] * 1) <= 50)
+            ##
         else:
             print('yes t_cost')
             print(f't_cost: {self.t_cost}')
