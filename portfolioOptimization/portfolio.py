@@ -76,11 +76,8 @@ def main(*args, **params):
     stocks = params['stocks']
     budget = params['budget']
     sampler_args = params['sampler_args']
-    bin_size = params['bin_size']
     dates = params['dates'],
     file_path = params['file_path']
-    gamma = params['gamma'],
-    model_type = params['model_type']
     alpha = params['alpha']
     verbose = params['verbose']
     baseline = params['baseline']

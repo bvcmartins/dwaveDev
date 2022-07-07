@@ -97,15 +97,15 @@ class MultiPeriod(SinglePeriod):
         print(f'num_months: {num_months}')
         print(f'df all shape: {self.df_all.shape}')
         for i in range(3, num_months):
+        #for i in range(num_months):
+        #for i in range(4):
 
             # Look at just the data up to the current month
             df = self.df_all.iloc[0:i+1,:].copy()
-            print(f'df select:{df}')
             df.to_pickle(f'df_{i}.pkl')
             baseline_df_current = self.df_baseline.iloc[0:i+1,:]
             print("\nDate:", df.last_valid_index())
             df.index = pd.to_datetime(df.index)
-            print(f'df: {df}')
             months.append(df.last_valid_index().date())
             #months.append(df.last_valid_index())
 

@@ -145,7 +145,7 @@ class SinglePeriod:
             # Read in baseline data; resample to monthly
             index_df = DataReader(self.baseline, 'yahoo',
                                   self.dates[0], self.dates[1])
-            index_df = index_df.resample('BM').last()
+            #index_df = index_df.resample('BM').last()
             self.df_baseline = pd.DataFrame(index=index_df.index,
                                             columns=self.baseline)
             for i in self.baseline:
@@ -170,7 +170,7 @@ class SinglePeriod:
             # Read in daily data; resample to monthly
             panel_data = DataReader(self.stocks, 'yahoo',
                                     self.dates[0], self.dates[1])
-            panel_data = panel_data.resample('BM').last()
+            #panel_data = panel_data.resample('BM').last()
             self.df_all = pd.DataFrame(index=panel_data.index,
                                        columns=self.stocks)
 
@@ -298,13 +298,10 @@ class SinglePeriod:
 
             # indicator constraints
             for s in self.stocks:
-                print(f'stock {s}')
                 cqm.add_constraint(x[s] - x0[s]*y[s] >= 0,
                                    label=f'indicator_constraint_gte_{s}')
-                print(f'indicator_constraint_gte: {x[s] - x0[s]*y[s]} >= 0')
                 cqm.add_constraint(x[s] - x[s]*y[s] <= x0[s],
                                    label=f'indicator_constraint_lte_{s}')
-                print(f'indicator_constraint_lte: {x[s] - x[s]*y[s]} < {x0[s]}')
 
         if max_risk:
             # Adding maximum risk constraint
