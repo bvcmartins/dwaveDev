@@ -269,11 +269,14 @@ class SinglePeriod:
             cqm.add_constraint(quicksum([x[s]*self.price[s] for s in self.stocks])
                                >= 0.997*self.budget, label='lower_budget')
 
-            ## New section
-            #y = {s: Binary("Y[%s]" %s) for s in self.stocks}
-            #for s in self.stocks:
-            #    cqm.add_constraint(quicksum(y[s] * 1) <= 50)
-            ##
+            # z = {s: Binary("Z[%s]" %s) for s in self.stocks}
+            # for s in self.stocks:
+            #     cqm.add_constraint(x[s] - 1 * z[s] >= 0)
+            #     cqm.add_constraint(x[s] - x[s] * z[s] <= 0)
+            # print(f'z: {z}')
+            #
+            # cqm.add_constraint(quicksum([z[s] for s in self.stocks]) <= 2)
+
         else:
             print('yes t_cost')
             print(f't_cost: {self.t_cost}')
@@ -302,6 +305,15 @@ class SinglePeriod:
                                    label=f'indicator_constraint_gte_{s}')
                 cqm.add_constraint(x[s] - x[s]*y[s] <= x0[s],
                                    label=f'indicator_constraint_lte_{s}')
+
+            # z = {s: Binary("Z[%s]" %s) for s in self.stocks}
+            # for s in self.stocks:
+            #     cqm.add_constraint(x[s] - 1 * z[s] >= 0)
+            #     cqm.add_constraint(x[s] - x[s] * z[s] <= 0)
+            # print(f'z: {z}')
+
+            cqm.add_constraint(quicksum([z[s] for s in self.stocks]) <= 2)
+
 
         if max_risk:
             # Adding maximum risk constraint
